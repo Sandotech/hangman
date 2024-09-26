@@ -76,7 +76,7 @@ class Game
     puts "--------------"
     puts "Choose the game number to load"
     games.map.with_index do |game, index|
-      puts "#{index += 1}) #{game}"
+      puts "#{index += 1}) #{game.gsub("_data.marshal", "")}"
     end
   end
 end
