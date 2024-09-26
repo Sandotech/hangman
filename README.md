@@ -2,6 +2,8 @@
 
 This is a simple Hangman game implemented in Ruby. The game allows users to play a new game or resume a previously saved game. The project is structured into two main classes: `Hangman` and `Game`.
 
+![image](https://github.com/user-attachments/assets/b6479a5b-e7ee-4abf-a2e5-a19b044cd243)
+
 ## Table of Contents
 
 - [Hangman Game](#hangman-game)
