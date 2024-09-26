@@ -1,48 +1,55 @@
 # frozen_string_literal: true
 
-# Hangman game class
+# Hangman class
 class Hangman
-  TURN_LIMIT = 9
-  USED_CHARACTERS = []
 
-  attr_reader :actual_guess
+  attr_reader :actual_guess, :game
 
   def initialize
     @word = select_word
     @actual_guess = hide_word @word
+    @USED_CHARACTERS = []
+    @turn = 9
+    @game = set_game
   end
 
   def play
-    turns_left = TURN_LIMIT
-
-    until turns_left.zero? || won?
-      puts "Turns left: #{turns_left}"
+    until @turn.zero? || won?
+      puts "Turns left: #{@turn}"
       puts "Current state: #{@actual_guess}"
 
       guess = try_guess
+
+      save && break if guess == 'SAVE'
 
       indexes = obtain_matched_indexes(guess)
       replace_underscore(guess, indexes) if indexes.any?
 
       declare_won && break if won?
 
-      turns_left -= 1 if indexes.empty?
+      @turn -= 1 if indexes.empty?
     end
 
-    puts "You lost. The word was: #{@word}" unless won?
+    puts "You lost. The word was: #{@word}" if @turn == 0
   end
 
   def try_guess
-    print 'Enter a letter: '
+    puts 'Enter a letter:                         NOTE: Write SAVE save the current game'
     guess = gets.chomp.downcase
+    return 'SAVE' if guess.downcase == 'save'
     return valid_character?(guess) ? save_character(guess) : try_guess
+  end
+
+  private
+
+  def set_game
+    puts "Please introduce the name to save the game"
+    gets.chomp.upcase
   end
 
   def print_game
     puts @actual_guess
   end
-
-  private
 
   def won?
     @actual_guess.eql? @word
@@ -79,19 +86,22 @@ class Hangman
   end
 
   def save_character(character)
-    USED_CHARACTERS << character
+    @USED_CHARACTERS << character
     character
   end
 
   def character_used?(character)
-    !USED_CHARACTERS.include? character
+    !@USED_CHARACTERS.include? character
   end
 
   def select_word
     words = File.read('google-10000-english-no-swears.txt')
     words.split.select { |word| word.size.between? 5, 12 }.sample
   end
-end
 
-game = Hangman.new
-game.play
+  def save
+    data_to_save = Marshal.dump(self)
+
+    File.open("GAMES/#{@game}_data.marshal", 'wb') { |file| file.write(data_to_save) }
+  end
+end
