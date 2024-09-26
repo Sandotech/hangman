@@ -41,7 +41,7 @@ class Game
 
   def self.load_previous_game
     games = load_games
-    p games
+    show_games(games)
   end
 
   def select_game
@@ -51,12 +51,15 @@ class Game
   private
 
   def self.load_games
-    games = Dir.children('GAMES').select { |file| file.include?('.marshal') }
+    games = Dir.children('GAMES').select { |file| file.include?('_data.marshal') }
   end
 
   def self.show_games(games)
-    games.each.inject(0) do |number, game|
-      puts "#{number + 1}) #{game}"
+    puts "Previous Games:"
+    puts "--------------"
+    puts "Choose the game number to load"
+    games.map.with_index do |game, index|
+      puts "#{index += 1}) #{game}"
     end
   end
 end
