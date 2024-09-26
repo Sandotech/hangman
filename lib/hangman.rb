@@ -2,48 +2,54 @@
 
 # Hangman class
 class Hangman
-
   attr_reader :actual_guess, :game
 
   def initialize
     @word = select_word
     @actual_guess = hide_word @word
-    @USED_CHARACTERS = []
+    @used_characters = []
     @turn = 9
     @game = set_game
   end
 
   def play
     until @turn.zero? || won?
-      puts "Turns left: #{@turn}"
-      puts "Current state: #{@actual_guess}"
+      print_current_game
 
       guess = try_guess
 
       save && break if guess == 'SAVE'
 
       indexes = obtain_matched_indexes(guess)
-      replace_underscore(guess, indexes) if indexes.any?
-
-      declare_won && break if won?
+      replace_underscore(guess, indexes)
 
       @turn -= 1 if indexes.empty?
     end
-
-    puts "You lost. The word was: #{@word}" if @turn == 0
+    resolve_game
   end
 
   def try_guess
     puts 'Enter a letter:                         NOTE: Write SAVE save the current game'
     guess = gets.chomp.downcase
     return 'SAVE' if guess.downcase == 'save'
-    return valid_character?(guess) ? save_character(guess) : try_guess
+
+    valid_character?(guess) ? save_character(guess) : try_guess
   end
 
   private
 
+  def resolve_game
+    declare_won if won?
+    puts "You lost. The word was: #{@word}" if @turn.zero?
+  end
+
+  def print_current_game
+    puts "Turns left: #{@turn}"
+    puts "Current state: #{@actual_guess}"
+  end
+
   def set_game
-    puts "Please introduce the name to save the game"
+    puts 'Please introduce the name to save the game'
     gets.chomp.upcase
   end
 
@@ -56,7 +62,7 @@ class Hangman
   end
 
   def declare_won
-    puts "Congratulations, you won!"
+    puts 'Congratulations, you won!'
     puts "This is the word: #{@word}"
   end
 
@@ -65,7 +71,7 @@ class Hangman
   end
 
   def obtain_matched_indexes(character)
-    word_array = @word.split("")
+    word_array = @word.split('')
     word_array.each_index.with_object([]) { |index, arr| arr << index if word_array[index] == character }
   end
 
@@ -82,16 +88,16 @@ class Hangman
   end
 
   def hide_word(word)
-    word.split("").inject(String.new) { |string, val| string += "_" }
+    word.split('').inject(String.new) { |string, _val| "#{string}_" }
   end
 
   def save_character(character)
-    @USED_CHARACTERS << character
+    @used_characters << character
     character
   end
 
   def character_used?(character)
-    !@USED_CHARACTERS.include? character
+    !@used_characters.include? character
   end
 
   def select_word
