@@ -14,18 +14,22 @@ class Hangman
 
   def play
     turns_left = TURN_LIMIT
-    hidden_word = hide_word(word)
 
     until turns_left.zero? || won?
       puts "Turns left: #{turns_left}"
-      puts "Current state: #{hidden_word}"
+      puts "Current state: #{@actual_guess}"
 
       guess = try_guess
 
-      if word.include?(guess)
-        puts 'true'
-      end
+      indexes = obtain_matched_indexes(guess)
+      replace_underscore(guess, indexes) if indexes.any?
+
+      declare_won && break if won?
+
+      turns_left -= 1 if indexes.empty?
     end
+
+    puts "You lost. The word was: #{@word}" unless won?
   end
 
   def try_guess
@@ -42,6 +46,11 @@ class Hangman
 
   def won?
     @actual_guess.eql? @word
+  end
+
+  def declare_won
+    puts "Congratulations, you won!"
+    puts "This is the word: #{@word}"
   end
 
   def replace_underscore(character, indexes)
@@ -85,3 +94,4 @@ class Hangman
 end
 
 game = Hangman.new
+game.play
