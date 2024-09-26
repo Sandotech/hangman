@@ -2,12 +2,7 @@ require_relative 'hangman'
 
 class Game
 
-  # def initialize(hangman = Hangman::new)
-  #   @hangman = hangman
-  #   # @hangman.play
-  # end
-
-  def self.welcome
+  def self.play
     puts "Hi, would you like to load a previous game or start a new one?"
     puts "Type 1 to load a previous game"
     puts "Type 2 to start a new game"
@@ -26,6 +21,8 @@ class Game
     end
   end
 
+  private
+
   def self.chose_mode(selection)
     until selection == "1" || selection == "2"
       puts "Choose 1 or 2"
@@ -43,7 +40,7 @@ class Game
     games = load_games
     show_games(games)
     selection = select_game(games)
-    read_previous_game(games[selection])
+    play_previous_game(games[selection])
   end
 
   def self.select_game(games)
@@ -55,12 +52,14 @@ class Game
     selection.to_i - 1
   end
 
-  private
+  def self.play_previous_game(game)
+    game_to_resume = read_previous_game(game)
+    resume_game(game_to_resume)
+  end
 
   def self.read_previous_game(game)
     serialized_game = File.binread("GAMES/#{game}")
     game = Marshal.load(serialized_game)
-    resume_game(game)
   end
 
   def self.resume_game(game)
@@ -82,4 +81,4 @@ class Game
   end
 end
 
-game = Game.welcome
+Game.play
