@@ -16,7 +16,7 @@ class Hangman
     turns_left = TURN_LIMIT
     hidden_word = hide_word(word)
 
-    until turns_left.zero? || hidden_word == word
+    until turns_left.zero? || won?
       puts "Turns left: #{turns_left}"
       puts "Current state: #{hidden_word}"
 
@@ -35,10 +35,23 @@ class Hangman
   end
 
   def print_game
-    puts "You have to enter a letter and guess the right worrd"
+    puts @actual_guess
   end
 
   private
+
+  def won?
+    @actual_guess.eql? @word
+  end
+
+  def replace_underscore(character, indexes)
+    indexes.each { |index| @actual_guess[index] = character }
+  end
+
+  def obtain_matched_indexes(character)
+    word_array = @word.split("")
+    word_array.each_index.with_object([]) { |index, arr| arr << index if word_array[index] == character }
+  end
 
   def valid_character?(character)
     valid_length?(character) && character_used?(character)
