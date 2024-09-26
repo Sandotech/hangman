@@ -42,13 +42,31 @@ class Game
   def self.load_previous_game
     games = load_games
     show_games(games)
+    selection = select_game(games)
+    read_previous_game(games[selection])
   end
 
-  def select_game
-
+  def self.select_game(games)
+    selection = gets.chomp
+    until selection.to_i.between?(1, games.size)
+      puts "Choose a valid game number"
+      selection = gets.chomp
+    end
+    selection.to_i - 1
   end
 
   private
+
+  def self.read_previous_game(game)
+    serialized_game = File.binread("GAMES/#{game}")
+    game = Marshal.load(serialized_game)
+    resume_game(game)
+  end
+
+  def self.resume_game(game)
+    puts "Welcome back, #{game.game}"
+    game.play
+  end
 
   def self.load_games
     games = Dir.children('GAMES').select { |file| file.include?('_data.marshal') }
